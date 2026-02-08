@@ -69,16 +69,16 @@ def load_models():
     # Initialize models
     embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
-    # Emotion models
-    emotion_model_name = "SamLowe/roberta-base-go_emotions"
+    # Emotion models (DistilBERT is smaller/faster)
+    emotion_model_name = "bhadresh-savani/distilbert-base-uncased-emotion"
     emotion_tokenizer = AutoTokenizer.from_pretrained(emotion_model_name)
     emotion_xai_model = AutoModelForSequenceClassification.from_pretrained(emotion_model_name, output_attentions=True)
     emotion_xai_model.eval()
 
     emotion_pipeline = pipeline("text-classification", model=emotion_model_name, top_k=None)
 
-    # Sentiment model
-    sentiment_pipeline = pipeline("sentiment-analysis", model="cardiffnlp/twitter-roberta-base-sentiment")
+    # Sentiment model (DistilBERT is smaller/faster)
+    sentiment_pipeline = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
     print("Models loaded.")
 
