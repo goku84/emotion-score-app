@@ -177,6 +177,12 @@ def analyze_reviews(df):
 
     # 1. Data Cleaning
     df = df.dropna(subset=["Text"])
+    
+    # LIMIT DATASET SIZE FOR DEMO (Render Free Tier Timeout Prevention)
+    if len(df) > 50:
+        print(f"Dataset too large ({len(df)} rows). Sampling 50 rows for free tier performance.")
+        df = df.sample(50, random_state=42)
+    
     if "Summary" not in df.columns: df["Summary"] = ""
     df["Summary"] = df["Summary"].fillna("")
     if "ProfileName" not in df.columns: df["ProfileName"] = "anonymous"
@@ -232,7 +238,9 @@ def analyze_reviews(df):
     df["exclamation_count"] = df["Text"].astype(str).apply(lambda x: x.count("!"))
     df["capital_ratio"] = df["Text"].astype(str).apply(lambda x: sum(1 for c in x if c.isupper()) / max(len(x), 1))
     
-    # Autoencoder
+    # Autoencoder (Replaced with IsolationForest for speed on Free Tier)
+    from sklearn.ensemble import IsolationForest
+    
     feature_cols = ["review_length", "exclamation_count", "capital_ratio", "user_review_count", "user_avg_score", "user_review_span_days", "rating_deviation", "reviews_per_day_product", "near_duplicate_count"]
     # Handle missing columns if any
     for col in feature_cols:
@@ -243,10 +251,24 @@ def analyze_reviews(df):
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X_final)
 
-    autoencoder = MLPRegressor(hidden_layer_sizes=(256, 128, 64, 128, 256), alpha=1e-4, max_iter=100, random_state=42)
-    autoencoder.fit(X_scaled, X_scaled)
-    reconstruction_error = ((X_scaled - autoencoder.predict(X_scaled)) ** 2).mean(axis=1)
-    df["trust_score"] = 100 - (100 * (reconstruction_error / reconstruction_error.max()))
+    # Use Isolation Forest instead of MLPRegressor
+    iso_forest = IsolationForest(contamination=0.2, random_state=42, n_jobs=-1)
+    iso_forest.fit(X_scaled)
+    
+    # IsolationForest returns -1 for anomalies, 1 for normal
+    # We convert this to a "trust score" between 0 and 100
+    # The decision_function returns lower scores for anomalies
+    scores = iso_forest.decision_function(X_scaled)
+    # Normalize scores to 0-100 range roughly
+    min_score = scores.min()
+    max_score = scores.max()
+    if max_score != min_score:
+        normalized_scores = (scores - min_score) / (max_score - min_score)
+    else:
+        normalized_scores = np.ones_like(scores)
+        
+    df["trust_score"] = normalized_scores * 100
+
 
     # Fake/Genuine Label
     fake_threshold = df["trust_score"].quantile(0.20)
