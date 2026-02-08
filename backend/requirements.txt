@@ -4,6 +4,9 @@ scikit-learn
 numpy
 transformers
 
+torch
+torchvision
+torchaudio
 spacy
 fastapi
 uvicorn

@@ -177,11 +177,10 @@ def analyze_reviews(df):
 
     # 1. Data Cleaning
     df = df.dropna(subset=["Text"])
-    
-    # LIMIT DATASET SIZE FOR DEMO (Render Free Tier Timeout Prevention)
-    if len(df) > 50:
-        print(f"Dataset too large ({len(df)} rows). Sampling 50 rows for free tier performance.")
-        df = df.sample(50, random_state=42)
+    # Limit data only if massive
+    if len(df) > 1000:
+        print(f"Dataset too large ({len(df)} rows). Sampling 1000 rows for performance.")
+        df = df.sample(1000, random_state=42)
     
     if "Summary" not in df.columns: df["Summary"] = ""
     df["Summary"] = df["Summary"].fillna("")

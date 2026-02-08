@@ -76,3 +76,7 @@ def get_aspect_report():
     if not analysis_result["aspects"]:
         raise HTTPException(status_code=404, detail="No analysis found")
     return analysis_result["aspects"]
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

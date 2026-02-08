@@ -58,7 +58,7 @@ export default function FakeReviewDetector() {
     };
 
     // Use environment variable for production, fallback to localhost for development
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://emotion-score-app.onrender.com";
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
     const handleUpload = async () => {
         if (!file) return;
