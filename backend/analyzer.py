@@ -1,18 +1,22 @@
 import pandas as pd
 import numpy as np
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.preprocessing import StandardScaler
-from sklearn.neural_network import MLPRegressor
-from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
-import torch
-import spacy
-from collections import Counter
-from sklearn.cluster import AgglomerativeClustering
 import os
+from collections import Counter
+import io
 
 # --- Globals & Models ---
-# Initialize models as None
+# Initialize modules and models as None to allow lazy loading
+torch = None
+spacy = None
+SentenceTransformer = None
+cosine_similarity = None
+StandardScaler = None
+MLPRegressor = None
+pipeline = None
+AutoTokenizer = None
+AutoModelForSequenceClassification = None
+AgglomerativeClustering = None
+
 nlp = None
 embedder = None
 emotion_tokenizer = None
@@ -21,12 +25,39 @@ emotion_pipeline = None
 sentiment_pipeline = None
 
 def load_models():
+    global torch, spacy, SentenceTransformer, cosine_similarity, StandardScaler, MLPRegressor
+    global pipeline, AutoTokenizer, AutoModelForSequenceClassification, AgglomerativeClustering
     global nlp, embedder, emotion_tokenizer, emotion_xai_model, emotion_pipeline, sentiment_pipeline
     
     if nlp is not None:
         return
 
-    print("Loading NLP models...")
+    print("Loading heavy libraries and models...")
+    
+    # Lazy imports
+    import torch as _torch
+    import spacy as _spacy
+    from sentence_transformers import SentenceTransformer as _SentenceTransformer
+    from sklearn.metrics.pairwise import cosine_similarity as _cosine_similarity
+    from sklearn.preprocessing import StandardScaler as _StandardScaler
+    from sklearn.neural_network import MLPRegressor as _MLPRegressor
+    from transformers import pipeline as _pipeline, AutoTokenizer as _AutoTokenizer, AutoModelForSequenceClassification as _AutoModelForSequenceClassification
+    from sklearn.cluster import AgglomerativeClustering as _AgglomerativeClustering
+
+    # Assign to globals
+    torch = _torch
+    spacy = _spacy
+    SentenceTransformer = _SentenceTransformer
+    cosine_similarity = _cosine_similarity
+    StandardScaler = _StandardScaler
+    MLPRegressor = _MLPRegressor
+    pipeline = _pipeline
+    AutoTokenizer = _AutoTokenizer
+    AutoModelForSequenceClassification = _AutoModelForSequenceClassification
+    AgglomerativeClustering = _AgglomerativeClustering
+
+    print("Libraries loaded. Initializing models...")
+
     try:
         nlp = spacy.load("en_core_web_sm")
     except OSError:
