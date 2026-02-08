@@ -3,7 +3,7 @@ sentence-transformers
 scikit-learn
 numpy
 transformers
-torch
+
 spacy
 fastapi
 uvicorn

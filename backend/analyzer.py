@@ -221,7 +221,7 @@ def analyze_reviews(df):
         df["reviews_per_day_product"] = 1
 
     # Text Embeddings
-    text_embeddings = embedder.encode(df["Text"].tolist(), batch_size=64, show_progress_bar=True)
+    text_embeddings = embedder.encode(df["Text"].tolist(), batch_size=16, show_progress_bar=True)
     
     # Duplicate Detection
     similarity_matrix = cosine_similarity(text_embeddings)
@@ -373,12 +373,12 @@ def analyze_reviews(df):
     if not aspect_df.empty:
         texts = aspect_df["text"].tolist()
         # Batch process emotion
-        emo_outputs = emotion_pipeline(texts, batch_size=16, truncation=True)
+        emo_outputs = emotion_pipeline(texts, batch_size=4, truncation=True)
         aspect_df["emotion"] = [max(o, key=lambda x: x["score"])["label"] for o in emo_outputs]
         aspect_df["emotion_score"] = [max(o, key=lambda x: x["score"])["score"] for o in emo_outputs]
         
         # Batch process sentiment
-        sent_outputs = sentiment_pipeline(texts, batch_size=16, truncation=True)
+        sent_outputs = sentiment_pipeline(texts, batch_size=4, truncation=True)
         aspect_df["sentiment"] = [o["label"] for o in sent_outputs]
         aspect_df["sentiment_score"] = [o["score"] for o in sent_outputs]
 
