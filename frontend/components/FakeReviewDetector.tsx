@@ -9,6 +9,7 @@ import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart as RechartsBarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import BackgroundBubbles from './BackgroundBubbles';
 
 // --- Types ---
 interface AnalysisSummary {
@@ -109,64 +110,133 @@ export default function FakeReviewDetector() {
 
     if (!results) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-8 p-8">
-                <div className="text-center space-y-4 max-w-2xl">
-                    <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                        Fake Review Detection System
-                    </h1>
-                    <p className="text-muted-foreground text-lg">
-                        Upload your dataset (CSV) to detect fake reviews, analyze emotions, and uncover opinion manipulation using advanced AI.
-                    </p>
+            <div className="relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden bg-slate-950 text-slate-100 selection:bg-cyan-500/30">
+                {/* --- Ambient Background Animations --- */}
+                {/* --- Ambient Background Animations --- */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {/* Grid Pattern - Kept very subtle texture */}
+                    <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
+
+                    {/* New Physics Bubbles Component */}
+                    <BackgroundBubbles />
+
+                    {/* Static decorative data lines - kept for depth */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_50%_50%,rgba(6,182,212,0.02),transparent)]" />
                 </div>
 
-                <Card className="w-full max-w-md border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Upload className="w-5 h-5 text-blue-500" />
-                            Upload Dataset
-                        </CardTitle>
-                        <CardDescription>Supported format: CSV (must contain 'Text' column)</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <Input
-                            type="file"
-                            accept=".csv"
-                            onChange={handleFileChange}
-                            className="cursor-pointer bg-white dark:bg-slate-950"
-                        />
-                        {analyzing && (
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-xs text-muted-foreground">
-                                    <span>Analyzing reviews...</span>
-                                    <span>{progress}%</span>
+                {/* --- Content Container --- */}
+                <div className="relative z-10 flex flex-col items-center space-y-10 max-w-2xl w-full px-4">
+
+                    {/* Header */}
+                    <div className="text-center space-y-2 animate-[slide-up_0.7s_ease-out]">
+                        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                            Dataset Upload
+                        </h1>
+                        <p className="text-cyan-400 font-medium tracking-[0.2em] text-sm uppercase">
+                            AI / ML Readiness Interface
+                        </p>
+                    </div>
+
+                    {/* Upload Zone */}
+                    <div className="relative group">
+                        {/* The Circular Drop Zone */}
+                        <div className={`
+                            relative z-0 flex flex-col items-center justify-center
+                            w-72 h-72 md:w-80 md:h-80 rounded-full
+                            border-2 border-dashed transition-all duration-500 ease-out
+                            ${file
+                                ? "border-cyan-400 bg-cyan-950/20 shadow-[0_0_30px_rgba(6,182,212,0.15)]"
+                                : "border-slate-700 hover:border-cyan-500/50 hover:bg-slate-900/50"
+                            }
+                            ${analyzing ? "scale-95 opacity-50 cursor-not-allowed" : "scale-100"}
+                        `}>
+
+                            {/* Animated ring when active */}
+                            <div className={`absolute inset-0 rounded-full border border-cyan-500/30 scale-110 opacity-0 transition-opacity duration-500 ${file ? "opacity-100 animate-pulse" : "group-hover:opacity-100"}`} />
+
+                            {/* Actual File Input (Hidden Overlay) */}
+                            {!analyzing && (
+                                <input
+                                    type="file"
+                                    accept=".csv"
+                                    onChange={handleFileChange}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50"
+                                    title="Drop dataset here"
+                                />
+                            )}
+
+                            {/* State: Analyzing (Full Circle Animation) */}
+                            {analyzing ? (
+                                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-full overflow-hidden bg-slate-950/80 backdrop-blur-sm animate-[zoom-in_0.3s_ease-out]">
+                                    {/* Rotating Radar Effect */}
+                                    <div className="absolute inset-0 rounded-full radar-loader" />
+
+                                    {/* Content inside loader */}
+                                    <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-2">
+                                        <div className="text-4xl font-bold font-mono text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]">
+                                            {progress}%
+                                        </div>
+                                        <div className="text-xs text-cyan-300/80 tracking-widest uppercase animate-pulse">
+                                            Analyzing Dataset
+                                        </div>
+                                        {/* Optional scanning line effect */}
+                                        <div className="absolute inset-0 w-full h-[2px] bg-cyan-400/50 shadow-[0_0_15px_cyan] animate-[scan-line_2s_linear_infinite]" />
+                                    </div>
                                 </div>
-                                <Progress value={progress} className="h-2" />
+                            ) : file ? (
+                                // State: File Selected
+                                <div className="flex flex-col items-center space-y-4 animate-[zoom-in_0.3s_ease-out] z-10 pointer-events-none">
+                                    <div className="w-16 h-16 rounded-full bg-cyan-400/20 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+                                        <FileText className="w-8 h-8 text-cyan-400" />
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="text-white font-medium truncate max-w-[200px]">{file.name}</p>
+                                        <p className="text-xs text-cyan-400/70 mt-1">{(file.size / 1024).toFixed(1)} KB</p>
+                                    </div>
+                                    <p className="text-slate-400 text-xs mt-2">Click to change file</p>
+                                </div>
+                            ) : (
+                                // State: Default (No File)
+                                <div className="flex flex-col items-center space-y-4 text-center p-6 z-10 pointer-events-none">
+                                    <div className="w-16 h-16 rounded-full bg-slate-800/50 flex items-center justify-center group-hover:bg-cyan-900/20 transition-colors duration-300">
+                                        <Upload className="w-8 h-8 text-slate-400 group-hover:text-cyan-400 transition-colors duration-300" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-lg font-medium text-slate-200 group-hover:text-white transition-colors">Drag dataset here</p>
+                                        <p className="text-sm text-slate-500 uppercase tracking-wide group-hover:text-cyan-400/70 transition-colors">or browse</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Action Buttons (External to circle to avoid click conflicts if needed, or overlay) */}
+                        {file && !analyzing && (
+                            <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-48 animate-[slide-up_0.5s_ease-out]">
+                                <Button
+                                    onClick={handleUpload}
+                                    className="w-full bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-900/20 border border-cyan-400/20 rounded-full h-12 text-md font-medium tracking-wide"
+                                >
+                                    START ANALYSIS
+                                </Button>
                             </div>
                         )}
-                    </CardContent>
-                    <CardFooter>
-                        <Button
-                            onClick={handleUpload}
-                            disabled={!file || analyzing}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                            {analyzing ? "Processing..." : "Start Analysis"}
-                        </Button>
-                    </CardFooter>
-                </Card>
+                    </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl text-center">
-                    {[
-                        { icon: AlertTriangle, title: "Fake Detection", desc: "Autoencoder-based anomaly detection" },
-                        { icon: Activity, title: "Emotion Analysis", desc: "RoBERTa-driven psychological profiling" },
-                        { icon: Search, title: "Opinion Mining", desc: "Aspect-based sentiment extraction" }
-                    ].map((feature, i) => (
-                        <div key={i} className="flex flex-col items-center space-y-2 p-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                            <feature.icon className="w-8 h-8 text-slate-500" />
-                            <h3 className="font-semibold">{feature.title}</h3>
-                            <p className="text-sm text-muted-foreground">{feature.desc}</p>
+                    {/* Footer Info */}
+                    {!file && !analyzing && (
+                        <div className="grid grid-cols-3 gap-8 pt-8 text-center opacity-60 hover:opacity-100 transition-opacity duration-500">
+                            {[
+                                { title: "CSV SUPPORT", desc: "Structured Data" },
+                                { title: "AUTO-DETECT", desc: "Fake Patterns" },
+                                { title: "SECURE", desc: "Local Processing" } // or similar
+                            ].map((item, i) => (
+                                <div key={i} className="flex flex-col items-center">
+                                    <p className="text-xs font-bold text-slate-300 tracking-wider mb-1">{item.title}</p>
+                                    <p className="text-[10px] text-cyan-500/70 uppercase">{item.desc}</p>
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    )}
                 </div>
             </div>
         );
